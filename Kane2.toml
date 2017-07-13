@@ -1,0 +1,9 @@
+[RSI]
+interval = 9
+low = 36
+high = 69
+persistence = 1
+
+[ADX]
+period = 10
+value = 25
