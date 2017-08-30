@@ -9,7 +9,7 @@ var method = {}
 
 // Prepare everything our method needs
 method.init = function() {
-  this.name = 'gannswing'
+  this.name = 'gannswing'  
 
   // keep dedicated amount of historic data
   this.history = {
@@ -232,8 +232,8 @@ method.update = function(candle) {
 
 // For debugging purposes.
 // For debugging purposes.
-method.log = function() {
-    log.debug('gannswing:    buycount: ' + this.swing.buycount
+method.log = function() {    
+	log.debug('gannswing:    buycount: ' + this.swing.buycount
                     + ' sellcount: ' + this.swing.sellcount);
     log.debug('              tradebuy: ' + this.swing.tradebuy
                     + ' tradesell: ' + this.swing.tradesell);
@@ -243,15 +243,16 @@ method.log = function() {
 
 // Based on the newly calculated information, check if we should
 // update or not.
-method.check = function() {
-  var price = this.lastPrice
+method.check = function(candle) {
+  var price = this.candle.close;
+  //log.debug('price = ', price);
   if(this.swing.tradebuy) {
     if(this.trend.direction !== 'long') {
-      this.trend.adviced= false; this.trend.direction= 'long'
+      this.trend.adviced = false; this.trend.direction = 'long'
     }
     if(!this.trend.adviced) {
-      this.trend.adviced= true
-      this.history.buyPrice= price
+      this.trend.adviced = true
+      this.history.buyPrice = price
       this.advice('long')
     }
     else this.advice()
@@ -280,16 +281,19 @@ method.checkStopLoss = function(price) {
   if(!settings.stoploss.enabled)
     return false
   if(this.trend.adviced && this.trend.direction === 'long') {
-    sl= this.history.buyPrice * (1 - settings.stoploss.percent / 100)
+	//log.debug('history.buyPrice = ', this.history.buyPrice);
+    sl = this.history.buyPrice * (1 - settings.stoploss.percent / 100)
+	//log.debug('sl = ', sl);
     if(price < sl) {
-      this.trend.direction= 'stoploss'
+      log.debug('stoploss triggered!');
+	  this.trend.direction= 'stoploss'
       this.duration= 0; this.trend.persisted= false
       this.advice('short');
-      return true
+      return true;
     }
     if(settings.stoploss.trailing && price > this.history.buyPrice) {
-      this.history.buyPrice= price
-      return false
+      this.history.buyPrice = price
+      return false;
     }
   }
 }
